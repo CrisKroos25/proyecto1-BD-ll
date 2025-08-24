@@ -3,10 +3,10 @@ import pymysql
 def Connect():
     #Funcion para conectarse
     return pymysql.connect(
-        host="",
+        host="localhost",
         user="root",
         password="",
-        database="",
+        database="tienda",
         cursorclass = pymysql.cursors.DictCursor
     )
 

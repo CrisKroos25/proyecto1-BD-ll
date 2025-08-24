@@ -40,7 +40,7 @@ class SidePanel(QFrame):
             ("📁", "Archivo"),
             ("📁", "Productos"),
             ("📁", "Cotizaciones"),
-            ("📁", "Edición"),
+            ("📁", "Bitacora"),
             ("📁", "Backups"),
             ("⚙️", "Configuración"),
         ]

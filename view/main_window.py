@@ -4,6 +4,7 @@ from view.main_content import MainContent
 from view.home import Home
 from view.products import Products
 from view.backups import Backups
+from view.logs import Logs
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -27,7 +28,7 @@ class MainWindow(QMainWindow):
         self.stack.addWidget(MainContent("Archivo"))    # 1: Archivo
         self.stack.addWidget(Products())               # 2: Productos
         self.stack.addWidget(MainContent("Cotizaciones")) # 3: Cotizaciones
-        self.stack.addWidget(MainContent("Edición"))    # 4: Edición
+        self.stack.addWidget(Logs())    # 4: Bitacora
         self.stack.addWidget(Backups())                # 5: Backups
         self.stack.addWidget(MainContent("Configuracion")) # 6: Configuración
 

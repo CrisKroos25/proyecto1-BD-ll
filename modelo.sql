@@ -15,3 +15,16 @@ CREATE TABLE producto (
     UNIQUE KEY ux_producto_codigo (codigo),
     KEY ix_producto_nombre (nombre_comercial)
 ) ENGINE=InnoDB;
+
+CREATE TABLE bitacora(
+	id INT AUTO_INCREMENT PRIMARY KEY,
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    usuario VARCHAR(50),
+    operacion ENUM('INSERT', 'UPDATE', 'DELETE', 'PUNTO') NOT NULL,
+    tabla_afectada VARCHAR(50),
+    datos TEXT,
+    estado ENUM ('COMMIT', 'ROLLBACK'),
+    comentario TEXT,
+    punto_recuperacion VARCHAR(500)
+)	ENGINE=InnoDB;
+

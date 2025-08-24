@@ -1,6 +1,7 @@
 from PyQt6 import uic
 from PyQt6.QtWidgets import QMainWindow, QTableWidgetItem, QMessageBox
 from connect_db import Connect   # función que abre la conexión a MySQL
+from datetime import datetime
 import pymysql
 
 # Clase que representa la ventana de "Productos"
@@ -16,6 +17,7 @@ class Products(QMainWindow):
 
         # Conectar el botón "Registrar" con la función que inserta datos
         self.btn_registrar.clicked.connect(self.add_info)
+        self.reload.clicked.connect(self.load_data)
 
     # -------------------- CARGAR DATOS --------------------
     def load_data(self, use_active_tx=True):
@@ -86,7 +88,7 @@ class Products(QMainWindow):
             cn.begin()          # Iniciar transacción
             cur = cn.cursor()   # Crear cursor
 
-            # Consulta SQL parametrizada para evitar inyecciones
+            # --- INSERT ---
             sql = """
                 INSERT INTO producto
                     (codigo, nombre_comercial, stock, precio_venta, precio_costo, estado)
@@ -111,6 +113,23 @@ class Products(QMainWindow):
             QMessageBox.information(self, "OK", "Producto agregado correctamente → COMMIT")
             self.load_data()  # Recargar tabla para mostrar el nuevo producto
 
+            # --- LOG (COMMIT) ---
+
+            cur.execute("""
+                INSERT INTO bitacora (usuario, operacion, tabla_afectada, datos, estado, comentario, punto_recuperacion)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """, (
+                "usuario_root",
+                "INSERT",
+                "producto",
+                str(params),  # aquí params es tu tupla de valores del INSERT original
+                "COMMIT",
+                "Producto insertado correctamente",
+                f"punto_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
+            ))
+            cn.commit()
+
+
         except pymysql.MySQLError as e:
             # Si ocurre un error de MySQL (clave duplicada, check, etc.)
             if cn:
@@ -119,14 +138,28 @@ class Products(QMainWindow):
                 except:
                     pass
             QMessageBox.critical(self, "MySQL", f"ROLLBACK (MySQL):\n{e!r}")
+            cur.execute("""
+                            INSERT INTO bitacora (usuario, operacion, tabla_afectada, datos, estado, comentario, punto_recuperacion)
+                            VALUES (%s, %s, %s, %s, %s, %s, %s)
+                        """, (
+                "usuario_root", "INSERT", "producto", str(params), "ROLLBACK", f"Error: {e}", f"punto_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
+            ))
+            cn.commit()
         except Exception as e:
-            # Si ocurre otro error general
+            # Sí ocurre otro error general
             if cn:
                 try:
                     cn.rollback()
                 except:
                     pass
             QMessageBox.critical(self, "Error", f"ROLLBACK (general):\n{e!r}")
+            cur.execute("""
+                            INSERT INTO bitacora (usuario, operacion, tabla_afectada, datos, estado, comentario, punto_recuperacion)
+                            VALUES (%s, %s, %s, %s, %s, %s, %s)
+                        """, (
+                "usuario_root", "INSERT", "producto", str(params), "ROLLBACK", f"Error: {e}", f"punto_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
+            ))
+            cn.commit()
         finally:
             # Cerrar cursor y conexión para liberar recursos
             if cur:
