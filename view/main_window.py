@@ -5,6 +5,7 @@ from view.home import Home
 from view.products import Products
 from view.backups import Backups
 from view.logs import Logs
+from view.settings import Settings
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -25,12 +26,10 @@ class MainWindow(QMainWindow):
         # Pila de pantallas; cada índice es una “vista”
         self.stack = QStackedWidget()
         self.stack.addWidget(Home())                    # 0: Inicio
-        self.stack.addWidget(MainContent("Archivo"))    # 1: Archivo
         self.stack.addWidget(Products())               # 2: Productos
-        self.stack.addWidget(MainContent("Cotizaciones")) # 3: Cotizaciones
         self.stack.addWidget(Logs())    # 4: Bitacora
         self.stack.addWidget(Backups())                # 5: Backups
-        self.stack.addWidget(MainContent("Configuracion")) # 6: Configuración
+        self.stack.addWidget(Settings()) # 6: Configuración
 
         # Panel lateral con botones
         self.panel = SidePanel()

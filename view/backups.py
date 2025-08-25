@@ -17,7 +17,7 @@ class Backups(QMainWindow):
             QMessageBox.warning(self, "Advertencia", "Seleccione una opción de backup.")
             return
 
-        # Ejecutar script de export (ajusta con la ruta real de tu script)
+        # Ejecutar script de export
         process = QProcess(self)
         process.startDetached("python", ["scripts/export_completo.py", opcion])
 
@@ -29,7 +29,7 @@ class Backups(QMainWindow):
             QMessageBox.warning(self, "Advertencia", "Seleccione una opción de backup.")
             return
 
-        # Ejecutar script de import (ajusta con la ruta real de tu script)
+        # Ejecutar script de import
         process = QProcess(self)
         process.startDetached("python", ["scripts/import_completo.py", opcion])
 

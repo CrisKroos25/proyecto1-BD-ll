@@ -4,19 +4,19 @@ from PyQt6.QtWidgets import QFrame, QVBoxLayout, QPushButton
 # Estilos QSS
 # =======================
 # Color de fondo oscuro para el panel lateral
-DARK_QSS_PANEL = "background-color: #222;"
+DARK_QSS_PANEL = "background-color: #bcd;"
 
 # Estilo de los botones en modo oscuro
 DARK_QSS_BUTTON = """
 QPushButton {
     background-color: transparent;  /* fondo transparente */
-    color: white;                   /* texto en blanco */
+    color: black;                   /* texto en blanco */
     text-align: left;               /* alineado a la izquierda */
     border: none;                   /* sin borde */
     padding: 10px;                  /* espacio interno */
 }
 QPushButton:hover {
-    background-color: #333;         /* color al pasar el ratón */
+    background-color: #abc;         /* color al pasar el ratón */
 }
 """
 
@@ -37,9 +37,7 @@ class SidePanel(QFrame):
         # Datos de los botones: cada tupla es (icono, texto)
         buttons_data = [
             ("🏠", "Inicio"),
-            ("📁", "Archivo"),
             ("📁", "Productos"),
-            ("📁", "Cotizaciones"),
             ("📁", "Bitacora"),
             ("📁", "Backups"),
             ("⚙️", "Configuración"),

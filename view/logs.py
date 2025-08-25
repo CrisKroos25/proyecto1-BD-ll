@@ -94,6 +94,9 @@ class Logs(QMainWindow):
         cur.close()
         cn.close()
 
+        QMessageBox.information(self, "OK", "Punto agregado correctamente")
+        self.load_data()  # Recargar tabla para mostrar el nuevo producto
+
     def get_back_point(self):
         nombre_punto, ok1 = QInputDialog.getText(self, "Buscar punto", "Ingresa el nombre del punto a regresar:")
 
@@ -115,12 +118,13 @@ class Logs(QMainWindow):
         cur.execute("SELECT * FROM bitacora WHERE id > %s ORDER BY id ASC", (id_punto,))
         rows = cur.fetchall()
 
+        #Simular un rollback manual
         for log in rows:
             if log["operacion"] == "INSERT" and log["estado"] == "COMMIT" and log["tabla_afectada"] == "producto":
-                datos = eval(log["datos"])  # cuidado en real → mejor usar json.loads
+                datos = eval(log["datos"])
                 codigo = datos[0]
                 cur.execute("DELETE FROM producto WHERE codigo=%s", (codigo,))
-                print(f"✔ Eliminado producto {codigo} para volver a {nombre_punto}")
+                print(f"Eliminado producto {codigo} para volver a {nombre_punto}")
 
         cn.commit()
         cur.close()

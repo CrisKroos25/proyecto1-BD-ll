@@ -4,7 +4,7 @@ from view.main_window import MainWindow
 
 def main():
     app = QApplication(sys.argv)
-    app.setStyleSheet("""QWidget { background: #000; color: #EAEAEA; }""")
+    app.setStyleSheet("""QWidget { background: #fff; color: #000; }""")
 
     w = MainWindow()
     w.setMinimumWidth(900)

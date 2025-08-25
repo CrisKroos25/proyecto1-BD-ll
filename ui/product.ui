@@ -200,11 +200,11 @@
         </layout>
        </widget>
       </item>
-      <item row="1" column="0">
+      <item row="2" column="0">
        <widget class="QFrame" name="function_frame">
         <property name="maximumSize">
          <size>
-          <width>200</width>
+          <width>500</width>
           <height>16777215</height>
          </size>
         </property>
@@ -238,6 +238,20 @@
           </widget>
          </item>
          <item>
+          <widget class="QPushButton" name="btn_actualizar">
+           <property name="text">
+            <string>Actualizar producto</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btn_eliminar">
+           <property name="text">
+            <string>Eliminar producto</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QPushButton" name="reload">
            <property name="text">
             <string>Recargar tabla</string>
@@ -247,7 +261,7 @@
         </layout>
        </widget>
       </item>
-      <item row="2" column="0">
+      <item row="3" column="0">
        <widget class="QFrame" name="result_frame">
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>

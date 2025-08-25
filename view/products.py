@@ -17,6 +17,8 @@ class Products(QMainWindow):
 
         # Conectar el botón "Registrar" con la función que inserta datos
         self.btn_registrar.clicked.connect(self.add_info)
+        self.btn_actualizar.clicked.connect(self.update_info)
+        self.btn_eliminar.clicked.connect(self.delete_info)
         self.reload.clicked.connect(self.load_data)
 
     # -------------------- CARGAR DATOS --------------------
@@ -172,3 +174,120 @@ class Products(QMainWindow):
                     cn.close()
                 except:
                     pass
+
+
+    def update_info(self):
+        """
+        Actualiza un producto en la tabla 'producto'.
+        Usa transacciones: si hay error → rollback, si todo ok → commit.
+        """
+        cn, cur = None, None
+        params = None
+        try:
+            cn = Connect()
+            cn.begin()
+            cur = cn.cursor()
+
+            # --- UPDATE ---
+            sql = """
+                UPDATE producto
+                SET nombre_comercial=%s, stock=%s, precio_venta=%s, precio_costo=%s, estado=%s
+                WHERE codigo=%s
+            """
+            params = (
+                self.nombre.text().strip(),
+                self.stock.text().strip(),
+                self.p_venta.text().strip(),
+                (self.p_costo.text().strip() or None) if hasattr(self, "p_costo") else None,
+                self.estado.text().strip(),
+                self.codigo.text().strip()  # código como identificador
+            )
+
+            cur.execute(sql, params)
+            cn.commit()
+
+            QMessageBox.information(self, "OK", "Producto actualizado correctamente → COMMIT")
+            self.load_data()
+
+            # --- LOG (COMMIT) ---
+            cur.execute("""
+                INSERT INTO bitacora (usuario, operacion, tabla_afectada, datos, estado, comentario, punto_recuperacion)
+                VALUES (%s,%s,%s,%s,%s,%s,%s)
+            """, (
+                "usuario_root", "UPDATE", "producto",
+                str(params), "COMMIT",
+                "Producto actualizado correctamente",
+                f"punto_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
+            ))
+            cn.commit()
+
+        except pymysql.MySQLError as e:
+            if cn: cn.rollback()
+            QMessageBox.critical(self, "MySQL", f"ROLLBACK (MySQL):\n{e!r}")
+            try:
+                cur.execute("""
+                    INSERT INTO bitacora (usuario, operacion, tabla_afectada, datos, estado, comentario, punto_recuperacion)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s)
+                """, (
+                    "usuario_root", "UPDATE", "producto", str(params),
+                    "ROLLBACK", f"Error: {e}", f"punto_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
+                ))
+                cn.commit()
+            except:
+                pass
+        finally:
+            if cur: cur.close()
+            if cn: cn.close()
+
+    def delete_info(self):
+        """
+        Elimina un producto en la tabla 'producto'.
+        Usa transacciones: si hay error → rollback, si todo ok → commit.
+        """
+        cn, cur = None, None
+        params = None
+        try:
+            cn = Connect()
+            cn.begin()
+            cur = cn.cursor()
+
+            # --- DELETE ---
+            sql = "DELETE FROM producto WHERE codigo=%s"
+            params = (self.codigo.text().strip(),)
+
+            cur.execute(sql, params)
+            cn.commit()
+
+            QMessageBox.information(self, "OK", "Producto eliminado correctamente → COMMIT")
+            self.load_data()
+
+            # --- LOG (COMMIT) ---
+            cur.execute("""
+                INSERT INTO bitacora (usuario, operacion, tabla_afectada, datos, estado, comentario, punto_recuperacion)
+                VALUES (%s,%s,%s,%s,%s,%s,%s)
+            """, (
+                "usuario_root", "DELETE", "producto",
+                str(params), "COMMIT",
+                "Producto eliminado correctamente",
+                f"punto_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
+            ))
+            cn.commit()
+
+        except pymysql.MySQLError as e:
+            if cn: cn.rollback()
+            QMessageBox.critical(self, "MySQL", f"ROLLBACK (MySQL):\n{e!r}")
+            try:
+                cur.execute("""
+                    INSERT INTO bitacora (usuario, operacion, tabla_afectada, datos, estado, comentario, punto_recuperacion)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s)
+                """, (
+                    "usuario_root", "DELETE", "producto", str(params),
+                    "ROLLBACK", f"Error: {e}", f"punto_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
+                ))
+                cn.commit()
+            except:
+                pass
+        finally:
+            if cur: cur.close()
+            if cn: cn.close()
+
